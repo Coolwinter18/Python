@@ -12,6 +12,9 @@ print(nombres[0]) #imprime el primer elemento
 print(nombres[1]) #imprime el segundo elemento
 #Navegacion inversa
 print(nombres[-1]) #imprime el último elemento)
+
+
+#Parte 2
 #Imprime un rango 
 print(nombres[0:2])#sin incluir el indice 2
 #ir del inicio al indice indicado
@@ -30,6 +33,9 @@ if "Carla" in nombres:
 else:
     print("No existe en la lista de nombres")     
 #preguntar el largo de una lista
+
+
+#Parte 3
 print(len(nombres))    
 #agregar un elemento
 nombres.append("Lorenzo")
