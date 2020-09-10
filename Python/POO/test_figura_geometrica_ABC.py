@@ -1,5 +1,5 @@
-from herencia_multiple_ABC.cuadrado_ABC import Cuadrado
-from herencia_multiple_ABC.figura_geometrica_ABC import FiguraGeometrica
+from AC.cuadrado import Cuadrado
+from AC.figura_geometrica import FiguraGeometrica
 
 #No se puede instanciar una clase abstracta
 #figuraGeometrica = FiguraGeometrica(3,4)

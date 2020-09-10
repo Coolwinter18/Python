@@ -1,5 +1,5 @@
-from figura_geometrica_ABC import FiguraGeometrica
-from color_ABC import Color
+from AC.figura_geometrica import FiguraGeometrica
+from AC.color import Color
 
 class Cuadrado(FiguraGeometrica, Color):
     def __init__(self, lado, color):
