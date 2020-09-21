@@ -7,7 +7,7 @@ conexion = psycopg2.connect(user="postgres",
                  database='test_db')
 
 cursor = conexion.cursor()
-query = 'SELECT * FROM persona'
+query = 'SELECT * FROM persona WHERE id_persona = 1'
 cursor.execute(query)
 resultado_query = cursor.fetchall()
 print(resultado_query)
