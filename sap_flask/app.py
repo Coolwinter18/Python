@@ -1,11 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for
 from flask_migrate import Migrate
-
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from werkzeug.utils import redirect
 
 from database import db
+from forms import PersonaForm
 from models import Persona
 
 app = Flask(__name__)
@@ -20,8 +18,8 @@ FULL_URL_DB = f'postgresql://{USER_DB}:{PASS_DB}@{URL_DB}/{NAME_DB}'
 app.config['SQLALCHEMY_DATABASE_URI'] = FULL_URL_DB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-#inicializacion de objeto db de sqlalchemy
-#db = SQLAlchemy(app)
+# inicializacion de objeto db de sqlalchemy
+# db = SQLAlchemy(app)
 db.init_app(app)
 
 # configurar flask migrate
@@ -32,20 +30,13 @@ migrate.init_app(app, db)
 app.config['SECRET_KEY'] = 'llave_secreta'
 
 
-
-class PersonaForm(FlaskForm):
-    nombre = StringField('Nombre', validators=[DataRequired()])
-    apellido = StringField('Apellido')
-    email = StringField('Email', validators=[DataRequired()])
-    enviar = SubmitField('Enviar')
-
-
 @app.route('/')
 @app.route('/index')
 @app.route('/index.html')
 def inicio():
     # Listado de personas
-    personas = Persona.query.all()
+    #personas = Persona.query.all()
+    personas = Persona.query.order_by('id')
     total_personas = Persona.query.count()
     app.logger.debug(f'Listado Personas: {personas}')
     app.logger.debug(f'Total Personas: {total_personas}')
@@ -64,3 +55,36 @@ def ver_detalle(id):
 @app.route('/agregar', methods=['GET', 'POST'])
 def agregar():
     persona = Persona()
+    personaForm = PersonaForm(obj=persona)  # obj en flask / instance en django
+    if request.method == 'POST':
+        if personaForm.validate_on_submit():
+            personaForm.populate_obj(persona)
+            app.logger.debug(f'Persona a Insertar: {persona}')
+            #Insertamos nuevo registro a la BBDD
+            db.session.add(persona)
+            db.session.commit()
+            return redirect(url_for('inicio'))
+    return render_template('agregar.html', forma=personaForm)
+
+@app.route('/editar/<int:id>',methods=['GET','POST'])
+def editar(id):
+    #Recuperamos el objeto persona a editar
+    persona = Persona.query.get_or_404(id)
+    personaForma = PersonaForm(obj=persona) # obj para flask | instance para django
+    if request.method == 'POST':
+        if personaForma.validate_on_submit():
+            personaForma.populate_obj(persona)
+            app.logger.debug(f'Persona a Actualizar: {persona}')
+            db.session.commit()
+    return render_template('editar.html',forma=personaForma)
+
+
+@app.route('/eliminar/<int:id>')
+def eliminar(id):
+    #Elimina el objeto persona a partir de id
+    persona = Persona.query.get_or_404(id)
+    app.logger.debug(f'Persona a eliminar: {persona}')
+    db.session.delete(persona)
+    db.session.commit()
+    return redirect(url_for('inicio'))
+
